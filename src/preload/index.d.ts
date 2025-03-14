@@ -139,6 +139,9 @@ declare global {
       getBinaryPath: (name: string) => Promise<string>
       installUVBinary: () => Promise<void>
       installBunBinary: () => Promise<void>
+      protocol: {
+        onReceiveData: (callback: (data: { url: string; params: any }) => void) => () => void
+      }
     }
   }
 }

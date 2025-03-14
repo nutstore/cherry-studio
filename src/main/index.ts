@@ -7,6 +7,7 @@ import { registerIpc } from './ipc'
 import { registerShortcuts } from './services/ShortcutService'
 import { TrayService } from './services/TrayService'
 import { windowService } from './services/WindowService'
+import { CHERRY_STUDIO_PROTOCOL, handleProtocolUrl, registerProtocolClient } from './services/ProtocolClient'
 
 // Check for single instance lock
 if (!app.requestSingleInstanceLock()) {
@@ -46,9 +47,22 @@ if (!app.requestSingleInstanceLock()) {
     }
   })
 
+  registerProtocolClient(app)
+
+  // macOS specific: handle protocol when app is already running
+  app.on('open-url', (event, url) => {
+    event.preventDefault()
+    handleProtocolUrl(url)
+  })
+
   // Listen for second instance
-  app.on('second-instance', () => {
+  app.on('second-instance', (_event, argv) => {
     windowService.showMainWindow()
+
+    // Protocol handler for Windows/Linux
+    // The commandLine is an array of strings where the last item might be the URL
+    const url = argv.find((arg) => arg.startsWith(CHERRY_STUDIO_PROTOCOL + '://'))
+    if (url) handleProtocolUrl(url)
   })
 
   app.on('browser-window-created', (_, window) => {
