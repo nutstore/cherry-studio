@@ -15,6 +15,7 @@ class BackupManager {
   private backupDir = path.join(app.getPath('temp'), 'cherry-studio', 'backup')
 
   constructor() {
+    this.checkConnection = this.checkConnection.bind(this)
     this.backup = this.backup.bind(this)
     this.restore = this.restore.bind(this)
     this.backupToWebdav = this.backupToWebdav.bind(this)
@@ -277,6 +278,11 @@ class BackupManager {
         onProgress(stats.size)
       }
     }
+  }
+
+  async checkConnection(_: Electron.IpcMainInvokeEvent, webdavConfig: WebDavConfig) {
+    const webdavClient = new WebDav(webdavConfig)
+    return await webdavClient.checkConnection()
   }
 }
 
