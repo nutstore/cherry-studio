@@ -430,6 +430,8 @@
       "error.invalid.enter.model": "Пожалуйста, выберите модель",
       "error.invalid.proxy.url": "Неверный URL прокси",
       "error.invalid.webdav": "Неверные настройки WebDAV",
+      "error.invalid.nutstore": "Неверные настройки Nutstore",
+      "error.invalid.nutstore_token": "Неверный Nutstore токен",
       "error.markdown.export.preconf": "Не удалось экспортировать файл Markdown в предуказанный путь",
       "error.markdown.export.specified": "Не удалось экспортировать файл Markdown",
       "error.notion.export": "Ошибка экспорта в Notion, пожалуйста, проверьте состояние подключения и настройки в документации",
@@ -773,6 +775,23 @@
           "title": "Настройка Obsidian",
           "api_key": "API Key Obsidian",
           "api_key_placeholder": "Введите API Key Obsidian"
+        },
+        "nutstore": {
+          "title": "Настройки Nutstore",
+          "isLogin": "Выполнен вход",
+          "notLogin": "Вход не выполнен",
+          "login.button": "Войти",
+          "logout.button": "Выйти",
+          "logout.title": "Вы уверены, что хотите выйти из Nutstore?",
+          "logout.content": "После выхода вы не сможете создавать резервные копии в Nutstore или восстанавливать данные из Nutstore.",
+          "checkConnection.name": "Проверить соединение",
+          "checkConnection.success": "Подключение к Nutstore установлено",
+          "checkConnection.fail": "Ошибка подключения к Nutstore",
+          "username": "Имя пользователя Nutstore",
+          "path": "Путь хранения Nutstore",
+          "path.placeholder": "Введите путь хранения Nutstore",
+          "backup.button": "Резервное копирование в Nutstore",
+          "restore.button": "Восстановление из Nutstore"
         }
       },
       "display.assistant.title": "Настройки ассистентов",
