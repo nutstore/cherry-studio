@@ -27,6 +27,8 @@ import NotionSettings from './NotionSettings'
 import ObsidianSettings from './ObsidianSettings'
 import WebDavSettings from './WebDavSettings'
 import YuqueSettings from './YuqueSettings'
+import { NutstoreIcon } from '@renderer/integration/nutstore'
+import NutstoreSettings from './NutstoreSettings'
 
 const DataSettings: FC = () => {
   const { t } = useTranslation()
@@ -38,6 +40,7 @@ const DataSettings: FC = () => {
   const menuItems = [
     { key: 'data', title: 'settings.data.data.title', icon: <DatabaseOutlined style={{ fontSize: 16 }} /> },
     { key: 'webdav', title: 'settings.data.webdav.title', icon: <CloudSyncOutlined style={{ fontSize: 16 }} /> },
+    { key: 'nutstore', title: 'settings.data.nutstore.title', icon: <NutstoreIcon /> },
     {
       key: 'markdown_export',
       title: 'settings.data.markdown_export.title',
@@ -187,6 +190,7 @@ const DataSettings: FC = () => {
           </>
         )}
         {menu === 'webdav' && <WebDavSettings />}
+        {menu === 'nutstore' && <NutstoreSettings />}
         {menu === 'markdown_export' && <MarkdownExportSettings />}
         {menu === 'notion' && <NotionSettings />}
         {menu === 'yuque' && <YuqueSettings />}
