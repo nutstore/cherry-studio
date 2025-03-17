@@ -69,4 +69,17 @@ export default class WebDav {
       throw error
     }
   }
+
+  public checkConnection = async () => {
+    if (!this.instance) {
+      throw new Error('WebDAV client not initialized')
+    }
+
+    try {
+      return await this.instance.exists('/')
+    } catch (error) {
+      Logger.error('[WebDAV] Error checking connection:', error)
+      throw error
+    }
+  }
 }

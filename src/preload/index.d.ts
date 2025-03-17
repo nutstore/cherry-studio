@@ -33,6 +33,7 @@ declare global {
         restore: (backupPath: string) => Promise<string>
         backupToWebdav: (data: string, webdavConfig: WebDavConfig) => Promise<boolean>
         restoreFromWebdav: (webdavConfig: WebDavConfig) => Promise<string>
+        checkConnection: (webdavConfig: WebDavConfig) => Promise<boolean>
       }
       file: {
         select: (options?: OpenDialogOptions) => Promise<FileType[] | null>
