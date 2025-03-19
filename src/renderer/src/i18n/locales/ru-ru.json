@@ -791,7 +791,13 @@
           "path": "Путь хранения Nutstore",
           "path.placeholder": "Введите путь хранения Nutstore",
           "backup.button": "Резервное копирование в Nutstore",
-          "restore.button": "Восстановление из Nutstore"
+          "restore.button": "Восстановление из Nutstore",
+          "pathSelector.title": "Путь хранения Nutstore",
+          "pathSelector.return": "Назад",
+          "pathSelector.currentPath": "Текущий путь",
+          "new_folder.button.confirm": "Подтвердить",
+          "new_folder.button.cancel": "Отмена",
+          "new_folder.button": "Новая папка"
         }
       },
       "display.assistant.title": "Настройки ассистентов",

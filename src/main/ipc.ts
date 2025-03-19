@@ -130,6 +130,7 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle('backup:backupToWebdav', backupManager.backupToWebdav)
   ipcMain.handle('backup:restoreFromWebdav', backupManager.restoreFromWebdav)
   ipcMain.handle('backup:checkConnection', backupManager.checkConnection)
+  ipcMain.handle('backup:createDirectory', backupManager.createDirectory)
 
   // file
   ipcMain.handle('file:open', fileManager.open)
