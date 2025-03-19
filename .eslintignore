@@ -3,3 +3,4 @@ dist
 out
 .gitignore
 scripts/cloudflare-worker.js
+src/renderer/src/integration/nutstore/sso/lib

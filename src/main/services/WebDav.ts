@@ -3,7 +3,14 @@ import { WebDavConfig } from '@types'
 import Logger from 'electron-log'
 import { HttpProxyAgent } from 'http-proxy-agent'
 import Stream from 'stream'
-import { BufferLike, createClient, GetFileContentsOptions, PutFileContentsOptions, WebDAVClient } from 'webdav'
+import {
+  BufferLike,
+  createClient,
+  CreateDirectoryOptions,
+  GetFileContentsOptions,
+  PutFileContentsOptions,
+  WebDAVClient
+} from 'webdav'
 export default class WebDav {
   public instance: WebDAVClient | undefined
   private webdavPath: string
@@ -23,6 +30,7 @@ export default class WebDav {
 
     this.putFileContents = this.putFileContents.bind(this)
     this.getFileContents = this.getFileContents.bind(this)
+    this.createDirectory = this.createDirectory.bind(this)
   }
 
   public putFileContents = async (
@@ -79,6 +87,19 @@ export default class WebDav {
       return await this.instance.exists('/')
     } catch (error) {
       Logger.error('[WebDAV] Error checking connection:', error)
+      throw error
+    }
+  }
+
+  public createDirectory = async (path: string, options?: CreateDirectoryOptions) => {
+    if (!this.instance) {
+      throw new Error('WebDAV client not initialized')
+    }
+
+    try {
+      return await this.instance.createDirectory(path, options)
+    } catch (error) {
+      Logger.error('[WebDAV] Error creating directory on WebDAV:', error)
       throw error
     }
   }

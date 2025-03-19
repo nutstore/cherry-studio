@@ -791,7 +791,13 @@
           "path": "Nutstoreストレージパス",
           "path.placeholder": "Nutstoreストレージパスを入力",
           "backup.button": "Nutstoreにバックアップ",
-          "restore.button": "Nutstoreから復元"
+          "restore.button": "Nutstoreから復元",
+          "pathSelector.title": "Nutstoreストレージパス",
+          "pathSelector.return": "戻る",
+          "pathSelector.currentPath": "現在のパス",
+          "new_folder.button.confirm": "確認",
+          "new_folder.button.cancel": "キャンセル",
+          "new_folder.button": "新しいフォルダ"
         }
       },
       "display.assistant.title": "アシスタント設定",
