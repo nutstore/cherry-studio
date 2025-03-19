@@ -2,6 +2,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 import type { ExtractChunkData } from '@llm-tools/embedjs-interfaces'
 import { FileType, KnowledgeBaseParams, KnowledgeItem, MCPServer, Shortcut, WebDavConfig } from '@types'
 import { contextBridge, ipcRenderer, OpenDialogOptions, shell } from 'electron'
+import { CreateDirectoryOptions } from 'webdav'
 
 // Custom APIs for renderer
 const api = {
@@ -28,7 +29,9 @@ const api = {
     backupToWebdav: (data: string, webdavConfig: WebDavConfig) =>
       ipcRenderer.invoke('backup:backupToWebdav', data, webdavConfig),
     restoreFromWebdav: (webdavConfig: WebDavConfig) => ipcRenderer.invoke('backup:restoreFromWebdav', webdavConfig),
-    checkConnection: (webdavConfig: WebDavConfig) => ipcRenderer.invoke('backup:checkConnection', webdavConfig)
+    checkConnection: (webdavConfig: WebDavConfig) => ipcRenderer.invoke('backup:checkConnection', webdavConfig),
+    createDirectory: (webdavConfig: WebDavConfig, path: string, options?: CreateDirectoryOptions) =>
+      ipcRenderer.invoke('backup:createDirectory', webdavConfig, path, options)
   },
   file: {
     select: (options?: OpenDialogOptions) => ipcRenderer.invoke('file:select', options),
