@@ -46,6 +46,7 @@ declare global {
         restoreFromWebdav: (webdavConfig: WebDavConfig) => Promise<string>
         listWebdavFiles: (webdavConfig: WebDavConfig) => Promise<BackupFile[]>
         checkConnection: (webdavConfig: WebDavConfig) => Promise<boolean>
+        createDirectory: (webdavConfig: WebDavConfig, path: string, options?: CreateDirectoryOptions) => Promise<void>
       }
       file: {
         select: (options?: OpenDialogOptions) => Promise<FileType[] | null>

@@ -6,6 +6,7 @@ import Logger from 'electron-log'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import { createClient, FileStat } from 'webdav'
+import { CreateDirectoryOptions } from 'webdav'
 
 import WebDav from './WebDav'
 import { windowService } from './WindowService'
@@ -283,6 +284,16 @@ class BackupManager {
   async checkConnection(_: Electron.IpcMainInvokeEvent, webdavConfig: WebDavConfig) {
     const webdavClient = new WebDav(webdavConfig)
     return await webdavClient.checkConnection()
+  }
+
+  async createDirectory(
+    _: Electron.IpcMainInvokeEvent,
+    webdavConfig: WebDavConfig,
+    path: string,
+    options?: CreateDirectoryOptions
+  ) {
+    const webdavClient = new WebDav(webdavConfig)
+    return await webdavClient.createDirectory(path, options)
   }
 }
 
