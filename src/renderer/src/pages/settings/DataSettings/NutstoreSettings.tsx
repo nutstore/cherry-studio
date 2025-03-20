@@ -8,6 +8,7 @@ import {
   fileStatToStatModel,
   getDirectoryContents,
   nutstoreSsoLogin,
+  useInitNutstore,
   useNutstoreSSO
 } from '@renderer/integration/nutstore'
 import {} from '@renderer/integration/nutstore/webdav'
@@ -59,6 +60,8 @@ const NutstoreSettings: FC = () => {
     const nutstoreToken = await nutstoreSSOHandler()
     dispatch(setNutstoreToken(nutstoreToken))
   }, [dispatch, nutstoreSSOHandler])
+
+  useInitNutstore()
 
   useEffect(() => {
     async function decryptTokenEffect() {
