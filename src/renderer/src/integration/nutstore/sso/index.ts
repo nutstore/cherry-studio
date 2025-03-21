@@ -8,12 +8,15 @@ export interface OAuthResponse {
 }
 
 // 使用闭包创建一个可以在外部resolve的Promise
-let resolveLastPromise: (value: { createOAuthUrl: (secret: Secret) => string; decrypt: (s: string) => string }) => void
+let resolveLastPromise: (value: {
+  createOAuthUrl: (secret: Secret) => string
+  decrypt: (app: string, s: string) => string
+}) => void
 
 // 立即创建Promise，但延迟resolve
 const lastPromise = new Promise<{
   createOAuthUrl: (secret: Secret) => string
-  decrypt: (s: string) => string
+  decrypt: (app: string, s: string) => string
 }>((resolve) => {
   resolveLastPromise = resolve
 })
@@ -39,7 +42,7 @@ export async function nutstoreSsoLogin() {
 export async function decryptToken(token: string) {
   const { decrypt } = await lastPromise
   try {
-    const decrypted = decrypt(token)
+    const decrypted = decrypt('cherrystudio', token)
     return JSON.parse(decrypted) as OAuthResponse
   } catch (error) {
     console.error('解密失败:', error)
