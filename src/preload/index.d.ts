@@ -137,6 +137,7 @@ declare global {
         hide: () => Promise<void>
         close: () => Promise<void>
         toggle: () => Promise<void>
+        setPin: (isPinned: boolean) => Promise<void>
       }
       aes: {
         encrypt: (text: string, secretKey: string, iv: string) => Promise<{ iv: string; encryptedData: string }>
@@ -147,6 +148,8 @@ declare global {
       }
       mcp: {
         removeServer: (server: MCPServer) => Promise<void>
+        restartServer: (server: MCPServer) => Promise<void>
+        stopServer: (server: MCPServer) => Promise<void>
         listTools: (server: MCPServer) => Promise<MCPTool[]>
         callTool: ({ server, name, args }: { server: MCPServer; name: string; args: any }) => Promise<any>
         getInstallInfo: () => Promise<{ dir: string; uvPath: string; bunPath: string }>

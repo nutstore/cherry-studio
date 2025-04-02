@@ -44,6 +44,11 @@
       "save.success": "保存成功",
       "save.title": "保存到智能体",
       "search": "搜索助手",
+      "settings.mcp": "MCP 服务器",
+      "settings.mcp.enableFirst": "请先在 MCP 设置中启用此服务器",
+      "settings.mcp.title": "MCP 设置",
+      "settings.mcp.noServersAvailable": "无可用 MCP 服务器。请在设置中添加服务器",
+      "settings.mcp.description": "默认启用的 MCP 服务器",
       "settings.default_model": "默认模型",
       "settings.knowledge_base": "知识库设置",
       "settings.model": "模型设置",
@@ -145,7 +150,10 @@
         "history": "聊天历史",
         "last": "已经是最后一条消息",
         "next": "下一条消息",
-        "prev": "上一条消息"
+        "prev": "上一条消息",
+        "top": "回到顶部",
+        "bottom": "回到底部",
+        "close": "关闭"
       },
       "resend": "重新发送",
       "save": "保存",
@@ -224,7 +232,10 @@
       "topics.title": "话题",
       "topics.unpinned": "取消固定",
       "translate": "翻译",
-      "topics.export.siyuan": "导出到思源笔记"
+      "topics.export.siyuan": "导出到思源笔记",
+      "topics.export.wait_for_title_naming": "正在生成标题...",
+      "topics.export.title_naming_success": "标题生成成功",
+      "topics.export.title_naming_failed": "标题生成失败，使用默认标题"
     },
     "code_block": {
       "collapse": "收起",
@@ -542,8 +553,18 @@
       "warn.siyuan.exporting": "正在导出到思源笔记，请勿重复请求导出!"
     },
     "minapp": {
+      "popup": {
+        "refresh": "刷新",
+        "close": "关闭小程序",
+        "minimize": "最小化小程序",
+        "devtools": "开发者工具",
+        "openExternal": "在浏览器中打开",
+        "rightclick_copyurl": "右键复制URL"
+      },
       "sidebar.add.title": "添加到侧边栏",
       "sidebar.remove.title": "从侧边栏移除",
+      "sidebar.close.title": "关闭",
+      "sidebar.closeall.title": "全部关闭",
       "sidebar.hide.title": "隐藏小程序",
       "title": "小程序"
     },
@@ -559,15 +580,19 @@
       },
       "footer": {
         "copy_last_message": "按 C 键复制",
+        "backspace_clear": "按 Backspace 清空",
         "esc": "按 ESC {{action}}",
         "esc_back": "返回",
-        "esc_close": "关闭窗口"
+        "esc_close": "关闭"
       },
       "input": {
         "placeholder": {
           "empty": "询问 {{model}} 获取帮助...",
           "title": "你想对下方文字做什么"
         }
+      },
+      "tooltip": {
+        "pin": "窗口置顶"
       }
     },
     "models": {
@@ -785,6 +810,8 @@
         "markdown_export.path_placeholder": "导出路径",
         "markdown_export.select": "选择",
         "markdown_export.title": "Markdown 导出",
+        "message_title.use_topic_naming.title": "使用话题命名模型为导出的消息创建标题",
+        "message_title.use_topic_naming.help": "开启后，使用话题命名模型为导出的消息创建标题。该项也会影响所有通过Markdown导出的方式。",
         "minute_interval_one": "{{count}} 分钟",
         "minute_interval_other": "{{count}} 分钟",
         "notion.api_key": "Notion 密钥",
@@ -910,10 +937,6 @@
       "display.custom.css": "自定义 CSS",
       "display.custom.css.cherrycss": "从 cherrycss.com 获取",
       "display.custom.css.placeholder": "/* 这里写自定义CSS */",
-      "display.minApp.disabled": "隐藏的小程序",
-      "display.minApp.empty": "把要隐藏的小程序从左侧拖拽到这里",
-      "display.minApp.title": "小程序显示设置",
-      "display.minApp.visible": "显示的小程序",
       "display.sidebar.chat.hiddenMessage": "助手是基础功能，不支持隐藏",
       "display.sidebar.disabled": "隐藏的图标",
       "display.sidebar.empty": "把要隐藏的功能从左侧拖拽到这里",
@@ -926,6 +949,20 @@
       "display.sidebar.visible": "显示的图标",
       "display.title": "显示设置",
       "display.topic.title": "话题设置",
+      "miniapps": {
+        "title": "小程序设置",
+        "disabled": "隐藏的小程序",
+        "empty": "把要隐藏的小程序从左侧拖拽到这里",
+        "visible": "显示的小程序",
+        "cache_settings": "缓存设置",
+        "cache_title": "小程序缓存数量",
+        "cache_description": "设置同时保持活跃状态的小程序最大数量",
+        "reset_tooltip": "重置为默认值",
+        "display_title": "小程序显示设置",
+        "sidebar_title": "侧边栏活跃小程序显示设置",
+        "sidebar_description": "设置侧边栏是否显示活跃的小程序",
+        "cache_change_notice": "更改将在打开的小程序增减至设定值后生效"
+      },
       "font_size.title": "消息字体大小",
       "general": "常规设置",
       "general.avatar.reset": "重置头像",
@@ -1013,7 +1050,17 @@
         "updateSuccess": "服务器更新成功",
         "url": "URL",
         "editMcpJson": "编辑 MCP 配置",
-        "installHelp": "获取安装帮助"
+        "installHelp": "获取安装帮助",
+        "tools": {
+          "inputSchema": "输入参数",
+          "availableTools": "可用工具",
+          "noToolsAvailable": "没有可用工具"
+        },
+        "deleteServer": "删除服务器",
+        "deleteServerConfirm": "确定要删除此服务器吗？",
+        "registry": "包管理源",
+        "registryTooltip": "选择用于安装包的源，以解决默认源的网络问题。",
+        "registryDefault": "默认"
       },
       "messages.divider": "消息分割线",
       "messages.grid_columns": "消息网格展示列数",
@@ -1163,7 +1210,7 @@
         "reset_defaults_confirm": "确定要重置所有快捷键吗？",
         "reset_to_default": "重置为默认",
         "search_message": "搜索消息",
-        "show_app": "显示应用",
+        "show_app": "显示/隐藏应用",
         "show_settings": "打开设置",
         "title": "快捷方式",
         "toggle_new_context": "清除上下文",

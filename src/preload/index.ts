@@ -112,7 +112,8 @@ const api = {
     show: () => ipcRenderer.invoke('miniwindow:show'),
     hide: () => ipcRenderer.invoke('miniwindow:hide'),
     close: () => ipcRenderer.invoke('miniwindow:close'),
-    toggle: () => ipcRenderer.invoke('miniwindow:toggle')
+    toggle: () => ipcRenderer.invoke('miniwindow:toggle'),
+    setPin: (isPinned: boolean) => ipcRenderer.invoke('miniwindow:set-pin', isPinned)
   },
   aes: {
     encrypt: (text: string, secretKey: string, iv: string) => ipcRenderer.invoke('aes:encrypt', text, secretKey, iv),
@@ -121,6 +122,8 @@ const api = {
   },
   mcp: {
     removeServer: (server: MCPServer) => ipcRenderer.invoke('mcp:remove-server', server),
+    restartServer: (server: MCPServer) => ipcRenderer.invoke('mcp:restart-server', server),
+    stopServer: (server: MCPServer) => ipcRenderer.invoke('mcp:stop-server', server),
     listTools: (server: MCPServer) => ipcRenderer.invoke('mcp:list-tools', server),
     callTool: ({ server, name, args }: { server: MCPServer; name: string; args: any }) =>
       ipcRenderer.invoke('mcp:call-tool', { server, name, args }),

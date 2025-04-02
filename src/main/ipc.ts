@@ -255,6 +255,7 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle('miniwindow:hide', () => windowService.hideMiniWindow())
   ipcMain.handle('miniwindow:close', () => windowService.closeMiniWindow())
   ipcMain.handle('miniwindow:toggle', () => windowService.toggleMiniWindow())
+  ipcMain.handle('miniwindow:set-pin', (_, isPinned) => windowService.setPinMiniWindow(isPinned))
 
   // aes
   ipcMain.handle('aes:encrypt', (_, text: string, secretKey: string, iv: string) => encrypt(text, secretKey, iv))
@@ -264,6 +265,8 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
 
   // Register MCP handlers
   ipcMain.handle('mcp:remove-server', mcpService.removeServer)
+  ipcMain.handle('mcp:restart-server', mcpService.restartServer)
+  ipcMain.handle('mcp:stop-server', mcpService.stopServer)
   ipcMain.handle('mcp:list-tools', mcpService.listTools)
   ipcMain.handle('mcp:call-tool', mcpService.callTool)
   ipcMain.handle('mcp:get-install-info', mcpService.getInstallInfo)
