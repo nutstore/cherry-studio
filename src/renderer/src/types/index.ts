@@ -1,4 +1,4 @@
-import { GroundingMetadata } from '@google/generative-ai'
+import { GroundingMetadata } from '@google/genai'
 import OpenAI from 'openai'
 import React from 'react'
 import { BuiltinTheme } from 'shiki'
@@ -88,6 +88,8 @@ export type Message = {
     mcpTools?: MCPToolResponse[]
     // Generate Image
     generateImage?: GenerateImageResponse
+    // knowledge
+    knowledge?: KnowledgeReference[]
   }
   // 多模型消息样式
   multiModelMessageStyle?: 'horizontal' | 'vertical' | 'fold' | 'grid'

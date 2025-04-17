@@ -328,7 +328,7 @@
       "no_api_key": "API key is not configured",
       "provider_disabled": "Model provider is not enabled",
       "render": {
-        "description": "Failed to render formula. Please check if the formula format is correct",
+        "description": "Failed to render message content. Please check if the message content format is correct",
         "title": "Render Error"
       },
       "user_message_not_found": "Cannot find original user message to resend",
@@ -548,7 +548,7 @@
       "restore.failed": "Restore failed",
       "restore.success": "Restored successfully",
       "save.success.title": "Saved successfully",
-      "searching": "Searching the internet...",
+      "searching": "Searching...",
       "success.joplin.export": "Successfully exported to Joplin",
       "success.markdown.export.preconf": "Successfully exported the Markdown file to the preconfigured path",
       "success.markdown.export.specified": "Successfully exported the Markdown file",
@@ -1361,7 +1361,9 @@
         "overwrite": "Override search service",
         "overwrite_tooltip": "Force use search service instead of LLM",
         "apikey": "API key",
-        "free": "Free"
+        "free": "Free",
+        "content_limit": "Content length limit",
+        "content_limit_tooltip": "Limit the content length of the search results; content that exceeds the limit will be truncated."
       },
       "quickPhrase": {
         "title": "Quick Phrases",
