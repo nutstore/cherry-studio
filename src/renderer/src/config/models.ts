@@ -1661,34 +1661,28 @@ export const SYSTEM_MODELS: Record<string, Model[]> = {
   ],
   openrouter: [
     {
-      id: 'google/gemma-2-9b-it:free',
+      id: 'google/gemini-2.5-flash-preview',
       provider: 'openrouter',
-      name: 'Google: Gemma 2 9B',
-      group: 'Gemma'
+      name: 'Google: Gemini 2.5 Flash Preview',
+      group: 'google'
     },
     {
-      id: 'microsoft/phi-3-mini-128k-instruct:free',
+      id: 'qwen/qwen-2.5-7b-instruct:free',
       provider: 'openrouter',
-      name: 'Phi-3 Mini 128K Instruct',
-      group: 'Phi'
+      name: 'Qwen: Qwen-2.5-7B Instruct',
+      group: 'qwen'
     },
     {
-      id: 'microsoft/phi-3-medium-128k-instruct:free',
+      id: 'deepseek/deepseek-chat',
       provider: 'openrouter',
-      name: 'Phi-3 Medium 128K Instruct',
-      group: 'Phi'
-    },
-    {
-      id: 'meta-llama/llama-3-8b-instruct:free',
-      provider: 'openrouter',
-      name: 'Meta: Llama 3 8B Instruct',
-      group: 'Llama3'
+      name: 'DeepSeek: V3',
+      group: 'deepseek'
     },
     {
       id: 'mistralai/mistral-7b-instruct:free',
       provider: 'openrouter',
       name: 'Mistral: Mistral 7B Instruct',
-      group: 'Mistral'
+      group: 'mistralai'
     }
   ],
   groq: [
@@ -2224,7 +2218,8 @@ export function isSupportedReasoningEffortModel(model?: Model): boolean {
     model.id.includes('claude-3-7-sonnet') ||
     model.id.includes('claude-3.7-sonnet') ||
     isOpenAIoSeries(model) ||
-    isGrokReasoningModel(model)
+    isGrokReasoningModel(model) ||
+    isGemini25ReasoningModel(model)
   ) {
     return true
   }
@@ -2251,6 +2246,18 @@ export function isGrokReasoningModel(model?: Model): boolean {
   return false
 }
 
+export function isGemini25ReasoningModel(model?: Model): boolean {
+  if (!model) {
+    return false
+  }
+
+  if (model.id.includes('gemini-2.5')) {
+    return true
+  }
+
+  return false
+}
+
 export function isReasoningModel(model?: Model): boolean {
   if (!model) {
     return false
@@ -2264,7 +2271,7 @@ export function isReasoningModel(model?: Model): boolean {
     return true
   }
 
-  if (model.id.includes('gemini-2.5-pro-exp')) {
+  if (isGemini25ReasoningModel(model)) {
     return true
   }
 
