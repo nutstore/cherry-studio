@@ -467,6 +467,11 @@
       "keep_alive_time.title": "保持活跃时间",
       "title": "LM Studio"
     },
+    "nutstore": {
+      "title": "坚果云登录",
+      "unlogin": "未登录坚果云，登录后可用",
+      "refresh_api.button": "刷新 API 密钥"
+    },
     "mermaid": {
       "download": {
         "png": "下载 PNG",
@@ -746,7 +751,8 @@
       "zhinao": "360智脑",
       "zhipu": "智谱AI",
       "voyageai": "Voyage AI",
-      "qiniu": "七牛云"
+      "qiniu": "七牛云",
+      "nutstore": "坚果云"
     },
     "restore": {
       "confirm": "确定要恢复数据吗？",

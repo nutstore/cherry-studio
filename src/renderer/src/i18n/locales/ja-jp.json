@@ -467,6 +467,11 @@
       "keep_alive_time.title": "保持時間",
       "title": "LM Studio"
     },
+    "nutstore": {
+      "title": "Nutstore ログイン",
+      "unlogin": "Nutstore にログインしていません。ログイン後に使用できます",
+      "refresh_api.button": "API キーを更新"
+    },
     "mermaid": {
       "download": {
         "png": "PNGをダウンロード",
@@ -746,7 +751,8 @@
       "zhinao": "360智脳",
       "zhipu": "智譜AI",
       "voyageai": "Voyage AI",
-      "qiniu": "七牛云"
+      "qiniu": "七牛云",
+      "nutstore": "堅果云"
     },
     "restore": {
       "confirm": "データを復元しますか？",

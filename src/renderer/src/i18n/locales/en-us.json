@@ -467,6 +467,11 @@
       "keep_alive_time.title": "Keep Alive Time",
       "title": "LM Studio"
     },
+    "nutstore": {
+      "title": "Nutstore Login",
+      "unlogin": "Not logged in to Nutstore, login available",
+      "refresh_api.button": "Refresh API Key"
+    },
     "mermaid": {
       "download": {
         "png": "Download PNG",
@@ -746,7 +751,8 @@
       "zhinao": "360AI",
       "zhipu": "ZHIPU AI",
       "voyageai": "Voyage AI",
-      "qiniu": "Qiniu"
+      "qiniu": "Qiniu",
+      "nutstore": "Nutstore"
     },
     "restore": {
       "confirm": "Are you sure you want to restore data?",

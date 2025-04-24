@@ -467,6 +467,11 @@
       "keep_alive_time.title": "Время жизни модели",
       "title": "LM Studio"
     },
+    "nutstore": {
+      "title": "Вход в Nutstore",
+      "unlogin": "Nutstore не зарегистрирован, зарегистрируйтесь, чтобы использовать",
+      "refresh_api.button": "Обновить API ключ"
+    },
     "mermaid": {
       "download": {
         "png": "Скачать PNG",
@@ -746,7 +751,8 @@
       "zhinao": "360AI",
       "zhipu": "ZHIPU AI",
       "voyageai": "Voyage AI",
-      "qiniu": "Qiniu"
+      "qiniu": "Qiniu",
+      "nutstore": "Nutstore"
     },
     "restore": {
       "confirm": "Вы уверены, что хотите восстановить данные?",

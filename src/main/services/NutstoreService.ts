@@ -1,11 +1,19 @@
 import path from 'node:path'
 
+import { isDev } from '@main/constant'
 import { NUTSTORE_HOST } from '@shared/config/nutstore'
 import { XMLParser } from 'fast-xml-parser'
 import { isNil, partial } from 'lodash'
 import { type FileStat } from 'webdav'
 
-import { createOAuthUrl, decryptSecret } from '../integration/nutstore/sso/lib/index.mjs'
+import {
+  _dont_use_in_prod_createLlmOAuthUrl,
+  _dont_use_in_prod_createOAuthUrl,
+  _dont_use_in_prod_decryptSecret,
+  createLlmOAuthUrl,
+  createOAuthUrl,
+  decryptSecret
+} from '../integration/nutstore/sso/lib/index.mjs'
 
 interface OAuthResponse {
   username: string
@@ -32,7 +40,7 @@ interface WebDAVResponse {
 }
 
 export async function getNutstoreSSOUrl() {
-  const url = await createOAuthUrl({
+  const url = await (isDev ? _dont_use_in_prod_createOAuthUrl : createOAuthUrl)({
     app: 'cherrystudio'
   })
   return url
@@ -40,7 +48,7 @@ export async function getNutstoreSSOUrl() {
 
 export async function decryptToken(token: string) {
   try {
-    const decrypted = await decryptSecret({
+    const decrypted = await (isDev ? _dont_use_in_prod_decryptSecret : decryptSecret)({
       app: 'cherrystudio',
       s: token
     })
@@ -49,6 +57,16 @@ export async function decryptToken(token: string) {
     console.error('解密失败:', error)
     return null
   }
+}
+
+export async function getLlmOAuthUrl(sk: string, email: string) {
+  const llmOAuthUrl = await (isDev ? _dont_use_in_prod_createLlmOAuthUrl : createLlmOAuthUrl)({
+    app: 'cherrystudio',
+    email,
+    sk
+  })
+
+  return llmOAuthUrl
 }
 
 export async function getDirectoryContents(token: string, target: string): Promise<FileStat[]> {

@@ -24,6 +24,7 @@ import MinimaxProviderLogo from '@renderer/assets/images/providers/minimax.png'
 import MistralProviderLogo from '@renderer/assets/images/providers/mistral.png'
 import ModelScopeProviderLogo from '@renderer/assets/images/providers/modelscope.png'
 import MoonshotProviderLogo from '@renderer/assets/images/providers/moonshot.png'
+import NutstoreProviderLogo from '@renderer/assets/images/providers/nutstore.png'
 import NvidiaProviderLogo from '@renderer/assets/images/providers/nvidia.png'
 import O3ProviderLogo from '@renderer/assets/images/providers/o3.png'
 import OcoolAiProviderLogo from '@renderer/assets/images/providers/ocoolai.png'
@@ -88,7 +89,8 @@ const PROVIDER_LOGO_MAP = {
   gpustack: GPUStackProviderLogo,
   alayanew: AlayaNewProviderLogo,
   voyageai: VoyageAIProviderLogo,
-  qiniu: QiniuProviderLogo
+  qiniu: QiniuProviderLogo,
+  nutstore: NutstoreProviderLogo
 } as const
 
 export function getProviderLogo(providerId: string) {

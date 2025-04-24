@@ -65,6 +65,7 @@ export enum IpcChannel {
   Nutstore_GetSsoUrl = 'nutstore:get-sso-url',
   Nutstore_DecryptToken = 'nutstore:decrypt-token',
   Nutstore_GetDirectoryContents = 'nutstore:get-directory-contents',
+  Nutstore_GetLLMOAuthUrl = 'nutstore:get-llm-oauth-url',
 
   //aes
   Aes_Encrypt = 'aes:encrypt',

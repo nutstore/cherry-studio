@@ -31,7 +31,7 @@ import {
   Provider,
   Suggestion
 } from '@renderer/types'
-import { removeSpecialCharactersForTopicName } from '@renderer/utils'
+import { removeSpecialCharactersForTopicName, uuid } from '@renderer/utils'
 import { addImageFileToContents } from '@renderer/utils/formats'
 import { mcpToolCallResponseToOpenAIMessage, parseAndCallTools } from '@renderer/utils/mcp-tools'
 import { buildSystemPrompt } from '@renderer/utils/prompt'
@@ -87,6 +87,24 @@ export default class OpenAIProvider extends BaseProvider {
     const providers = ['deepseek', 'baichuan', 'minimax', 'xirang']
 
     return providers.includes(this.provider.id)
+  }
+
+  /**
+   * 坚果云 Provider 特有功能，需要添加 token 和 taskId
+   * @param taskId - The taskId
+   * @returns The headers
+   */
+  private getHeaders(taskId?: string) {
+    let headers: Record<string, string> = {}
+
+    if (this.provider.id === 'nutstore') {
+      headers = {
+        token: this.apiKey,
+        taskId: taskId || uuid()
+      }
+    }
+
+    return headers
   }
 
   /**
@@ -429,6 +447,7 @@ export default class OpenAIProvider extends BaseProvider {
               ...this.getCustomParameters(assistant)
             },
             {
+              headers: this.getHeaders(messages[0].topicId),
               signal
             }
           )
@@ -530,6 +549,7 @@ export default class OpenAIProvider extends BaseProvider {
           ...this.getCustomParameters(assistant)
         },
         {
+          headers: this.getHeaders(messages[0].topicId),
           signal
         }
       )
@@ -576,13 +596,18 @@ export default class OpenAIProvider extends BaseProvider {
 
     console.debug('[translate] reqMessages', model.id, messages)
     // @ts-ignore key is not typed
-    const response = await this.sdk.chat.completions.create({
-      model: model.id,
-      messages: messages as ChatCompletionMessageParam[],
-      stream,
-      keep_alive: this.keepAliveTime,
-      temperature: assistant?.settings?.temperature
-    })
+    const response = await this.sdk.chat.completions.create(
+      {
+        model: model.id,
+        messages: messages as ChatCompletionMessageParam[],
+        stream,
+        keep_alive: this.keepAliveTime,
+        temperature: assistant?.settings?.temperature
+      },
+      {
+        headers: this.getHeaders()
+      }
+    )
 
     if (!stream) {
       return response.choices[0].message?.content || ''
@@ -652,13 +677,18 @@ export default class OpenAIProvider extends BaseProvider {
 
     console.debug('[summaries] reqMessages', model.id, [systemMessage, userMessage])
     // @ts-ignore key is not typed
-    const response = await this.sdk.chat.completions.create({
-      model: model.id,
-      messages: [systemMessage, userMessage] as ChatCompletionMessageParam[],
-      stream: false,
-      keep_alive: this.keepAliveTime,
-      max_tokens: 1000
-    })
+    const response = await this.sdk.chat.completions.create(
+      {
+        model: model.id,
+        messages: [systemMessage, userMessage] as ChatCompletionMessageParam[],
+        stream: false,
+        keep_alive: this.keepAliveTime,
+        max_tokens: 1000
+      },
+      {
+        headers: this.getHeaders(messages[0].topicId)
+      }
+    )
 
     // 针对思考类模型的返回，总结仅截取</think>之后的内容
     let content = response.choices[0].message?.content || ''
@@ -696,6 +726,7 @@ export default class OpenAIProvider extends BaseProvider {
         max_tokens: 1000
       },
       {
+        headers: this.getHeaders(),
         timeout: 20 * 1000
       }
     )
@@ -718,14 +749,19 @@ export default class OpenAIProvider extends BaseProvider {
 
     await this.checkIsCopilot()
 
-    const response = await this.sdk.chat.completions.create({
-      model: model.id,
-      stream: false,
-      messages: [
-        { role: 'system', content: prompt },
-        { role: 'user', content }
-      ]
-    })
+    const response = await this.sdk.chat.completions.create(
+      {
+        model: model.id,
+        stream: false,
+        messages: [
+          { role: 'system', content: prompt },
+          { role: 'user', content }
+        ]
+      },
+      {
+        headers: this.getHeaders()
+      }
+    )
 
     return response.choices[0].message?.content || ''
   }
@@ -778,7 +814,9 @@ export default class OpenAIProvider extends BaseProvider {
     try {
       await this.checkIsCopilot()
       console.debug('[checkModel] body', model.id, body)
-      const response = await this.sdk.chat.completions.create(body as ChatCompletionCreateParamsNonStreaming)
+      const response = await this.sdk.chat.completions.create(body as ChatCompletionCreateParamsNonStreaming, {
+        headers: this.getHeaders()
+      })
 
       return {
         valid: Boolean(response?.choices[0].message),
@@ -800,7 +838,9 @@ export default class OpenAIProvider extends BaseProvider {
     try {
       await this.checkIsCopilot()
 
-      const response = await this.sdk.models.list()
+      const response = await this.sdk.models.list({
+        headers: this.getHeaders()
+      })
 
       if (this.provider.id === 'github') {
         // @ts-ignore key is not typed

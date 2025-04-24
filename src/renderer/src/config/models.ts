@@ -2068,6 +2068,50 @@ export const SYSTEM_MODELS: Record<string, Model[]> = {
       name: 'Qwen2.5 72B Instruct',
       group: 'Qwen'
     }
+  ],
+  nutstore: [
+    {
+      id: 'deepseek/deepseek-chat',
+      provider: 'nutstore',
+      name: 'DeepSeek V3',
+      group: 'deepseek'
+    },
+    {
+      id: 'deepseek/deepseek-r1',
+      provider: 'nutstore',
+      name: 'DeepSeek R1',
+      group: 'deepseek'
+    },
+    {
+      id: 'qwen/qwq-32b',
+      provider: 'nutstore',
+      name: 'QWQ 32B',
+      group: 'qwen'
+    },
+    {
+      id: 'qwen/qwen-2.5-7b-instruct',
+      provider: 'nutstore',
+      name: 'Qwen-2.5-7B Instruct',
+      group: 'qwen'
+    },
+    {
+      id: 'anthropic/claude-3.7-sonnet',
+      provider: 'nutstore',
+      name: 'Claude 3.7 Sonnet',
+      group: 'anthropic'
+    },
+    {
+      id: 'google/gemini-2.0-flash-001',
+      provider: 'nutstore',
+      name: 'Gemini 2.0 Flash',
+      group: 'google'
+    },
+    {
+      id: 'google/gemini-2.5-pro-preview-03-25',
+      provider: 'nutstore',
+      name: 'Gemini 2.5 Pro Preview 03-25',
+      group: 'google'
+    }
   ]
 }
 

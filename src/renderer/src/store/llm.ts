@@ -27,6 +27,16 @@ export interface LlmState {
 
 export const INITIAL_PROVIDERS: Provider[] = [
   {
+    id: 'nutstore',
+    name: 'Nutstore',
+    type: 'openai',
+    apiKey: '',
+    apiHost: '',
+    models: SYSTEM_MODELS.nutstore,
+    isSystem: true,
+    enabled: true
+  },
+  {
     id: 'silicon',
     name: 'Silicon',
     type: 'openai',

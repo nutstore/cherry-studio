@@ -182,7 +182,8 @@ const api = {
     getSSOUrl: () => ipcRenderer.invoke(IpcChannel.Nutstore_GetSsoUrl),
     decryptToken: (token: string) => ipcRenderer.invoke(IpcChannel.Nutstore_DecryptToken, token),
     getDirectoryContents: (token: string, path: string) =>
-      ipcRenderer.invoke(IpcChannel.Nutstore_GetDirectoryContents, token, path)
+      ipcRenderer.invoke(IpcChannel.Nutstore_GetDirectoryContents, token, path),
+    getLLMOAuthUrl: (sk: string, email: string) => ipcRenderer.invoke(IpcChannel.Nutstore_GetLLMOAuthUrl, sk, email)
   },
   searchService: {
     openSearchWindow: (uid: string) => ipcRenderer.invoke(IpcChannel.SearchWindow_Open, uid),

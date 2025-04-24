@@ -332,6 +332,9 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.Nutstore_GetDirectoryContents, (_, token: string, path: string) =>
     NutstoreService.getDirectoryContents(token, path)
   )
+  ipcMain.handle(IpcChannel.Nutstore_GetLLMOAuthUrl, (_, sk: string, email: string) =>
+    NutstoreService.getLlmOAuthUrl(sk, email)
+  )
 
   // search window
   ipcMain.handle(IpcChannel.SearchWindow_Open, async (_, uid: string) => {

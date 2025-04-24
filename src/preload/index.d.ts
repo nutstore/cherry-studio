@@ -201,6 +201,7 @@ declare global {
         getSSOUrl: () => Promise<string>
         decryptToken: (token: string) => Promise<{ username: string; access_token: string }>
         getDirectoryContents: (token: string, path: string) => Promise<any>
+        getLLMOAuthUrl: (sk: string, email: string) => Promise<string>
       }
       searchService: {
         openSearchWindow: (uid: string) => Promise<string>
