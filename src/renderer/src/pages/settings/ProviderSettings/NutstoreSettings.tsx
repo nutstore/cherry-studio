@@ -4,12 +4,12 @@ import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { setNutstoreToken } from '@renderer/store/nutstore'
 import { isDev } from '@renderer/utils'
 import { Button, Space, Typography } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { SettingHelpTextRow, SettingSubtitle } from '..'
 
-export function NutstoreSettings() {
+export function NutstoreSettings({ setApiKey }: { setApiKey: (apiKey: string) => void }) {
   const { t } = useTranslation()
 
   const dispatch = useAppDispatch()
@@ -30,18 +30,21 @@ export function NutstoreSettings() {
     dispatch(setNutstoreToken(nutstoreToken))
   }
 
-  const handleRefreshLLMApiKey = async () => {
+  const handleRefreshLLMApiKey = useCallback(async () => {
     const llmOAuthUrl = await window.api.nutstore.getLLMOAuthUrl(nutstorePassword, nutstoreUsername)
     const res = await fetch(llmOAuthUrl)
     const data = (await res.json()) as { access_token: string }
+
+    setApiKey(data.access_token)
+
     updateProvider({
       ...provider,
       apiKey: data.access_token,
       apiHost: (await isDev())
-        ? 'http://192.168.3.124:9000/cherrystudio/llm-router'
-        : 'https://webdav-connect.jianguoyun.net.cn/cherrystudio/llm-router'
+        ? 'http://localhost.eo2suite.cn:9000/cherrystudio/llm-router/'
+        : 'https://webdav-connect.jianguoyun.net.cn/cherrystudio/llm-router/'
     })
-  }
+  }, [provider, updateProvider, nutstorePassword, nutstoreUsername])
 
   useEffect(() => {
     async function decryptTokenEffect() {
@@ -51,6 +54,7 @@ export function NutstoreSettings() {
         setNutstorePassword(decrypted.access_token)
       }
     }
+
     decryptTokenEffect()
   }, [nutstoreToken])
 

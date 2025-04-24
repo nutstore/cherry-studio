@@ -407,7 +407,7 @@ const ProviderSetting: FC<Props> = ({ provider: _provider }) => {
       {provider.id === 'lmstudio' && <LMStudioSettings />}
       {provider.id === 'gpustack' && <GPUStackSettings />}
       {provider.id === 'copilot' && <GithubCopilotSettings provider={provider} setApiKey={setApiKey} />}
-      {provider.id === 'nutstore' && <NutstoreSettings />}
+      {provider.id === 'nutstore' && <NutstoreSettings setApiKey={setApiKey} />}
       <SettingSubtitle style={{ marginBottom: 5 }}>
         <Space align="center" style={{ width: '100%', justifyContent: 'space-between' }}>
           <HStack alignItems="center" gap={5}>

@@ -99,7 +99,7 @@ export default class OpenAIProvider extends BaseProvider {
 
     if (this.provider.id === 'nutstore') {
       headers = {
-        token: this.apiKey,
+        token: `${this.apiKey}`,
         taskId: taskId || uuid()
       }
     }
