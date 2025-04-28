@@ -807,6 +807,9 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     if (!isGenerateImageModel(model) && assistant.enableGenerateImage) {
       updateAssistant({ ...assistant, enableGenerateImage: false })
     }
+    if (isGenerateImageModel(model) && !assistant.enableGenerateImage && model.id !== 'gemini-2.0-flash-exp') {
+      updateAssistant({ ...assistant, enableGenerateImage: true })
+    }
   }, [assistant, model, updateAssistant])
 
   const onMentionModel = (model: Model) => {
@@ -953,6 +956,7 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
                 setInputValue={setText}
                 resizeTextArea={resizeTextArea}
               />
+
               <GenerateImageButton
                 model={model}
                 assistant={assistant}

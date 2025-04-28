@@ -18,7 +18,7 @@ const api = {
   setTray: (isActive: boolean) => ipcRenderer.invoke(IpcChannel.App_SetTray, isActive),
   setTrayOnClose: (isActive: boolean) => ipcRenderer.invoke(IpcChannel.App_SetTrayOnClose, isActive),
   restartTray: () => ipcRenderer.invoke(IpcChannel.App_RestartTray),
-  setTheme: (theme: 'light' | 'dark') => ipcRenderer.invoke(IpcChannel.App_SetTheme, theme),
+  setTheme: (theme: 'light' | 'dark' | 'auto') => ipcRenderer.invoke(IpcChannel.App_SetTheme, theme),
   setCustomCss: (css: string) => ipcRenderer.invoke(IpcChannel.App_SetCustomCss, css),
   setAutoUpdate: (isActive: boolean) => ipcRenderer.invoke(IpcChannel.App_SetAutoUpdate, isActive),
   openWebsite: (url: string) => ipcRenderer.invoke(IpcChannel.Open_Website, url),
@@ -185,6 +185,10 @@ const api = {
     openSearchWindow: (uid: string) => ipcRenderer.invoke(IpcChannel.SearchWindow_Open, uid),
     closeSearchWindow: (uid: string) => ipcRenderer.invoke(IpcChannel.SearchWindow_Close, uid),
     openUrlInSearchWindow: (uid: string, url: string) => ipcRenderer.invoke(IpcChannel.SearchWindow_OpenUrl, uid, url)
+  },
+  webview: {
+    setOpenLinkExternal: (webviewId: number, isExternal: boolean) =>
+      ipcRenderer.invoke(IpcChannel.Webview_SetOpenLinkExternal, webviewId, isExternal)
   }
 }
 

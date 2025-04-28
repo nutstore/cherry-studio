@@ -28,7 +28,8 @@ declare global {
       setTray: (isActive: boolean) => void
       setTrayOnClose: (isActive: boolean) => void
       restartTray: () => void
-      setTheme: (theme: 'light' | 'dark') => void
+      setTheme: (theme: 'light' | 'dark' | 'auto') => void
+      getTheme: () => Promise<'light' | 'dark' | 'auto'>
       setCustomCss: (css: string) => void
       setAutoUpdate: (isActive: boolean) => void
       reload: () => void
@@ -203,6 +204,9 @@ declare global {
         openSearchWindow: (uid: string) => Promise<string>
         closeSearchWindow: (uid: string) => Promise<string>
         openUrlInSearchWindow: (uid: string, url: string) => Promise<string>
+      }
+      webview: {
+        setOpenLinkExternal: (webviewId: number, isExternal: boolean) => Promise<void>
       }
     }
   }
