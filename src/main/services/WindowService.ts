@@ -2,7 +2,8 @@ import { is } from '@electron-toolkit/utils'
 import { isDev, isLinux, isMac, isWin } from '@main/constant'
 import { getFilesDir } from '@main/utils/file'
 import { IpcChannel } from '@shared/IpcChannel'
-import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell } from 'electron'
+import { ThemeMode } from '@types'
+import { app, BrowserWindow, ipcMain, Menu, MenuItem, nativeTheme, shell } from 'electron'
 import Logger from 'electron-log'
 import windowStateKeeper from 'electron-window-state'
 import { join } from 'path'
@@ -11,6 +12,7 @@ import icon from '../../../build/icon.png?asset'
 import { titleBarOverlayDark, titleBarOverlayLight } from '../config'
 import { locales } from '../utils/locales'
 import { configManager } from './ConfigManager'
+import { initSessionUserAgent } from './WebviewService'
 
 export class WindowService {
   private static instance: WindowService | null = null
@@ -23,6 +25,7 @@ export class WindowService {
   private selectionMenuWindow: BrowserWindow | null = null
   private lastSelectedText: string = ''
   private contextMenu: Menu | null = null
+  private lastRendererProcessCrashTime: number = 0
 
   public static getInstance(): WindowService {
     if (!WindowService.instance) {
@@ -41,10 +44,16 @@ export class WindowService {
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1080,
       defaultHeight: 670,
-      fullScreen: false
+      fullScreen: false,
+      maximize: false
     })
 
     const theme = configManager.getTheme()
+    if (theme === ThemeMode.auto) {
+      nativeTheme.themeSource = 'system'
+    } else {
+      nativeTheme.themeSource = theme
+    }
 
     this.mainWindow = new BrowserWindow({
       x: mainWindowState.x,
@@ -59,8 +68,9 @@ export class WindowService {
       vibrancy: 'sidebar',
       visualEffectState: 'active',
       titleBarStyle: isLinux ? 'default' : 'hidden',
-      titleBarOverlay: theme === 'dark' ? titleBarOverlayDark : titleBarOverlayLight,
-      backgroundColor: isMac ? undefined : theme === 'dark' ? '#181818' : '#FFFFFF',
+      titleBarOverlay: nativeTheme.shouldUseDarkColors ? titleBarOverlayDark : titleBarOverlayLight,
+      backgroundColor: isMac ? undefined : nativeTheme.shouldUseDarkColors ? '#181818' : '#FFFFFF',
+      darkTheme: nativeTheme.shouldUseDarkColors,
       trafficLightPosition: { x: 8, y: 12 },
       ...(isLinux ? { icon } : {}),
       webPreferences: {
@@ -80,17 +90,55 @@ export class WindowService {
       this.miniWindow = this.createMiniWindow(true)
     }
 
+    //init the MinApp webviews' useragent
+    initSessionUserAgent()
+
     return this.mainWindow
   }
 
   private setupMainWindow(mainWindow: BrowserWindow, mainWindowState: any) {
     mainWindowState.manage(mainWindow)
 
+    this.setupMaximize(mainWindow, mainWindowState.isMaximized)
     this.setupContextMenu(mainWindow)
     this.setupWindowEvents(mainWindow)
     this.setupWebContentsHandlers(mainWindow)
     this.setupWindowLifecycleEvents(mainWindow)
+    this.setupMainWindowMonitor(mainWindow)
     this.loadMainWindowContent(mainWindow)
+  }
+
+  private setupMainWindowMonitor(mainWindow: BrowserWindow) {
+    mainWindow.webContents.on('render-process-gone', (_, details) => {
+      Logger.error(`Renderer process crashed with: ${JSON.stringify(details)}`)
+      const currentTime = Date.now()
+      const lastCrashTime = this.lastRendererProcessCrashTime
+      this.lastRendererProcessCrashTime = currentTime
+      if (currentTime - lastCrashTime > 60 * 1000) {
+        // 如果大于1分钟，则重启渲染进程
+        mainWindow.webContents.reload()
+      } else {
+        // 如果小于1分钟，则退出应用, 可能是连续crash，需要退出应用
+        app.exit(1)
+      }
+    })
+
+    mainWindow.webContents.on('unresponsive', () => {
+      // 在升级到electron 34后，可以获取具体js stack trace,目前只打个日志监控下
+      // https://www.electronjs.org/blog/electron-34-0#unresponsive-renderer-javascript-call-stacks
+      Logger.error('Renderer process unresponsive')
+    })
+  }
+
+  private setupMaximize(mainWindow: BrowserWindow, isMaximized: boolean) {
+    if (isMaximized) {
+      // 如果是从托盘启动，则需要延迟最大化，否则显示的就不是重启前的最大化窗口了
+      configManager.getLaunchToTray()
+        ? mainWindow.once('show', () => {
+            mainWindow.maximize()
+          })
+        : mainWindow.maximize()
+    }
   }
 
   private setupContextMenu(mainWindow: BrowserWindow) {
@@ -191,9 +239,11 @@ export class WindowService {
 
       const oauthProviderUrls = [
         'https://account.siliconflow.cn/oauth',
+        'https://cloud.siliconflow.cn/bills',
         'https://cloud.siliconflow.cn/expensebill',
         'https://aihubmix.com/token',
-        'https://aihubmix.com/topup'
+        'https://aihubmix.com/topup',
+        'https://aihubmix.com/statistics'
       ]
 
       if (oauthProviderUrls.some((link) => url.startsWith(link))) {
