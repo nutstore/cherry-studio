@@ -1,6 +1,7 @@
 import db from '@renderer/databases'
 import { autoRenameTopic } from '@renderer/hooks/useTopic'
 import { fetchChatCompletion } from '@renderer/services/ApiService'
+import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { createStreamProcessor, type StreamProcessorCallbacks } from '@renderer/services/StreamProcessingService'
 import { estimateMessagesUsage } from '@renderer/services/TokenService'
 import store from '@renderer/store'
@@ -46,7 +47,7 @@ const handleChangeLoadingOfTopic = async (topicId: string) => {
   store.dispatch(newMessagesActions.setTopicLoading({ topicId, loading: false }))
 }
 
-const saveMessageAndBlocksToDB = async (message: Message, blocks: MessageBlock[]) => {
+export const saveMessageAndBlocksToDB = async (message: Message, blocks: MessageBlock[]) => {
   try {
     console.log(`[DEBUG] saveMessageAndBlocksToDB started for message ${message.id} with ${blocks.length} blocks`)
     if (blocks.length > 0) {
@@ -119,7 +120,11 @@ const throttledBlockUpdate = throttle((id, blockUpdate) => {
   const state = store.getState()
   const block = state.messageBlocks.entities[id]
   // throttle是异步函数,可能会在complete事件触发后才执行
-  if (blockUpdate.status === MessageBlockStatus.STREAMING && block?.status === MessageBlockStatus.SUCCESS) return
+  if (
+    blockUpdate.status === MessageBlockStatus.STREAMING &&
+    (block?.status === MessageBlockStatus.SUCCESS || block?.status === MessageBlockStatus.ERROR)
+  )
+    return
 
   store.dispatch(updateOneBlock({ id, changes: blockUpdate }))
 }, 150)
@@ -135,7 +140,11 @@ export const throttledBlockDbUpdate = throttle(
     const state = store.getState()
     const block = state.messageBlocks.entities[blockId]
     // throttle是异步函数,可能会在complete事件触发后才执行
-    if (blockChanges.status === MessageBlockStatus.STREAMING && block?.status === MessageBlockStatus.SUCCESS) return
+    if (
+      blockChanges.status === MessageBlockStatus.STREAMING &&
+      (block?.status === MessageBlockStatus.SUCCESS || block?.status === MessageBlockStatus.ERROR)
+    )
+      return
     console.log(`[DB Throttle Block Update] Updating block ${blockId} with changes:`, blockChanges)
     try {
       await db.message_blocks.update(blockId, blockChanges)
@@ -271,6 +280,9 @@ const fetchAndProcessAssistantResponseImpl = async (
       lastBlockType = newBlockType
       if (newBlockType !== MessageBlockType.MAIN_TEXT) {
         accumulatedContent = ''
+      }
+      if (newBlockType !== MessageBlockType.THINKING) {
+        accumulatedThinking = ''
       }
       console.log(`[Transition] Adding/Updating new ${newBlockType} block ${newBlock.id}.`)
       dispatch(
@@ -587,12 +599,19 @@ const fetchAndProcessAssistantResponseImpl = async (
         dispatch(newMessagesActions.updateMessage({ topicId, messageId: assistantMsgId, updates: messageErrorUpdate }))
 
         saveUpdatesToDB(assistantMsgId, topicId, messageErrorUpdate, [])
+
+        EventEmitter.emit(EVENT_NAMES.MESSAGE_COMPLETE, {
+          id: assistantMsgId,
+          topicId,
+          status: isAbortError(error) ? 'pause' : 'error',
+          error: error.message
+        })
       },
       onComplete: async (status: AssistantMessageStatus, response?: Response) => {
         const finalStateOnComplete = getState()
         const finalAssistantMsg = finalStateOnComplete.messages.entities[assistantMsgId]
 
-        if (status === 'success' && finalAssistantMsg && response && !response?.usage) {
+        if (status === 'success' && finalAssistantMsg) {
           const userMsgId = finalAssistantMsg.askId
           const orderedMsgs = selectMessagesForTopic(finalStateOnComplete, topicId)
           const userMsgIndex = orderedMsgs.findIndex((m) => m.id === userMsgId)
@@ -602,8 +621,10 @@ const fetchAndProcessAssistantResponseImpl = async (
           // 更新topic的name
           autoRenameTopic(assistant, topicId)
 
-          const usage = await estimateMessagesUsage({ assistant, messages: finalContextWithAssistant })
-          response.usage = usage
+          if (response && !response.usage) {
+            const usage = await estimateMessagesUsage({ assistant, messages: finalContextWithAssistant })
+            response.usage = usage
+          }
         }
         if (response && response.metrics) {
           if (!response.metrics.completion_tokens && response.usage) {
@@ -628,6 +649,8 @@ const fetchAndProcessAssistantResponseImpl = async (
         )
 
         saveUpdatesToDB(assistantMsgId, topicId, messageUpdates, [])
+
+        EventEmitter.emit(EVENT_NAMES.MESSAGE_COMPLETE, { id: assistantMsgId, topicId, status })
       }
     }
 
@@ -888,7 +911,8 @@ export const resendMessageThunk =
       for (const originalMsg of assistantMessagesToReset) {
         const blockIdsToDelete = [...(originalMsg.blocks || [])]
         const resetMsg = resetAssistantMessage(originalMsg, {
-          status: AssistantMessageStatus.PENDING
+          status: AssistantMessageStatus.PENDING,
+          ...(assistantMessagesToReset.length === 1 ? { model: assistant.model } : {})
         })
 
         resetDataList.push({ resetMsg })
@@ -1381,5 +1405,114 @@ export const cloneMessagesToNewTopicThunk =
     } catch (error) {
       console.error(`[cloneMessagesToNewTopicThunk] Failed to clone messages:`, error)
       return false // Indicate failure
+    }
+  }
+
+/**
+ * Thunk to edit properties of a message and/or its associated blocks.
+ * Updates Redux state and persists changes to the database within a transaction.
+ * Message updates are optional if only blocks need updating.
+ */
+export const updateMessageAndBlocksThunk =
+  (
+    topicId: string,
+    // Allow messageUpdates to be optional or just contain the ID if only blocks are updated
+    messageUpdates: (Partial<Message> & Pick<Message, 'id'>) | null, // ID is always required for context
+    blockUpdatesList: Partial<MessageBlock>[] // Block updates remain required for this thunk's purpose
+  ) =>
+  async (dispatch: AppDispatch): Promise<boolean> => {
+    const messageId = messageUpdates?.id
+    console.log(
+      `[updateMessageAndBlocksThunk] Updating message ${messageId} context in topic ${topicId}. MessageUpdates:`,
+      messageUpdates,
+      `BlockUpdates:`,
+      blockUpdatesList
+    )
+
+    if (messageUpdates && !messageId) {
+      console.error('[updateMessageAndBlocksThunk] Message ID is required.')
+      return false
+    }
+
+    try {
+      // 1. 更新 Redux Store
+      if (messageUpdates && messageId) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { id: msgId, ...actualMessageChanges } = messageUpdates // Separate ID from actual changes
+
+        // Only dispatch message update if there are actual changes beyond the ID
+        if (Object.keys(actualMessageChanges).length > 0) {
+          dispatch(newMessagesActions.updateMessage({ topicId, messageId, updates: actualMessageChanges }))
+          console.log(`[updateMessageAndBlocksThunk] Dispatched message property updates for ${messageId} in Redux.`)
+        } else {
+          console.log(
+            `[updateMessageAndBlocksThunk] No message property updates for ${messageId} in Redux, only processing blocks.`
+          )
+        }
+      }
+
+      if (blockUpdatesList.length > 0) {
+        blockUpdatesList.forEach((blockUpdate) => {
+          const { id: blockId, ...blockChanges } = blockUpdate
+          if (blockId && Object.keys(blockChanges).length > 0) {
+            dispatch(updateOneBlock({ id: blockId, changes: blockChanges }))
+          } else if (!blockId) {
+            console.warn('[updateMessageAndBlocksThunk] Skipping block update due to missing block ID:', blockUpdate)
+          }
+        })
+        console.log(`[updateMessageAndBlocksThunk] Dispatched ${blockUpdatesList.length} block update(s) in Redux.`)
+      }
+
+      // 2. 更新数据库 (在事务中)
+      await db.transaction('rw', db.topics, db.message_blocks, async () => {
+        // Only update topic.messages if there were actual message changes
+        if (messageUpdates && Object.keys(messageUpdates).length > 0) {
+          const topic = await db.topics.get(topicId)
+          if (topic && topic.messages) {
+            const messageIndex = topic.messages.findIndex((m) => m.id === messageId)
+            if (messageIndex !== -1) {
+              Object.assign(topic.messages[messageIndex], messageUpdates)
+              await db.topics.update(topicId, { messages: topic.messages })
+              console.log(
+                `[updateMessageAndBlocksThunk] Updated message properties for ${messageId} in DB topic ${topicId}.`
+              )
+            } else {
+              console.error(
+                `[updateMessageAndBlocksThunk] Message ${messageId} not found in DB topic ${topicId} for property update.`
+              )
+              throw new Error(`Message ${messageId} not found in DB topic ${topicId} for property update.`)
+            }
+          } else {
+            console.error(
+              `[updateMessageAndBlocksThunk] Topic ${topicId} not found or empty for message property update.`
+            )
+            throw new Error(`Topic ${topicId} not found or empty for message property update.`)
+          }
+        }
+
+        // Always process block updates if the list is provided and not empty
+        if (blockUpdatesList.length > 0) {
+          const validBlockUpdatesForDb = blockUpdatesList
+            .map((bu) => {
+              const { id, ...changes } = bu
+              if (id && Object.keys(changes).length > 0) {
+                return { key: id, changes: changes }
+              }
+              return null
+            })
+            .filter((bu) => bu !== null) as { key: string; changes: Partial<MessageBlock> }[]
+
+          if (validBlockUpdatesForDb.length > 0) {
+            await db.message_blocks.bulkUpdate(validBlockUpdatesForDb)
+            console.log(`[updateMessageAndBlocksThunk] Updated ${validBlockUpdatesForDb.length} block(s) in DB.`)
+          }
+        }
+      })
+
+      console.log(`[updateMessageAndBlocksThunk] Successfully processed updates for message ${messageId} context.`)
+      return true
+    } catch (error) {
+      console.error(`[updateMessageAndBlocksThunk] Failed to process updates for message ${messageId}:`, error)
+      return false
     }
   }
